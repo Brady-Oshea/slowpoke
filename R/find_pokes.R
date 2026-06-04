@@ -21,19 +21,17 @@ find_poke <- function(poke_name) {
 #'
 #' @param poke_names A character vector of name patterns.
 #' @return A tibble of matching Pokémon card names and flavor text.
+#' @importFrom dplyr filter select distinct
+#' @importFrom stringr str_detect str_to_title
 #' @export
 find_many_pokes <- function(poke_names) {
+  dat <- load_data()
 
-  result <- dplyr::tibble()
+  titled <- stringr::str_to_title(poke_names)
+  pattern <- paste(titled, collapse = "|")
 
-  for (poke_name in poke_names) {
-
-    temp <- find_poke(poke_name)
-
-    result <- rbind(result, temp)
-
-  }
-
-  return(result)
-
+  dat |>
+    filter(stringr::str_detect(name, pattern)) |>
+    select(name, flavorText) |>
+    distinct()
 }
